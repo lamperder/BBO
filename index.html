@@ -1,1 +1,238 @@
-Hello World
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>BBO球員資料測試</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="提供方便的BBO球員資料查詢。">
+
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css">
+	<script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
+
+	<style>
+		body,
+		.ui.header {
+			font-family: 微軟正黑體;
+		}
+
+		#platform {
+			padding: 12px;
+		}
+
+		.ui.table tr.blue {
+			background-color: #BBDEFB;
+			color: #2196F3;
+		}
+
+		.ui.table tr.yellow {
+			background-color: #FFF9C4;
+			color: #FF9800;
+		}
+
+		.ui.table tr.red {
+			background-color: #FFCDD2;
+			color: #F44336;
+		}
+
+		.ui.table tr.gold {
+			background-color: #F0F4C3;
+			color: #FF5722;
+		}
+
+		.ui.table tr.purple {
+			background-color: #D1C4E9;
+			color: #673AB7;
+		}
+
+		.ui.table tr.black {
+			background-color: #000000;
+			color: #FFFFFF;
+		}
+
+		.ui.relaxed.list:not(.horizontal) .list>.item {
+			clear: none;
+    		float: left;
+    		padding: 2px 12px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="platform">
+		<div class="ui celled relaxed list">
+			<div class="item">
+				<div class="ui master checkbox">
+					<input type="checkbox" name="card_type">
+					<label>全部</label>
+				</div>
+				<div class="list">
+					<div class="item">
+						<div class="ui child checkbox">
+							<input type="checkbox" name="blue">
+							<label>藍卡</label>
+						</div>
+					</div>
+					<div class="item">
+						<div class="ui child checkbox">
+							<input type="checkbox" name="yellow">
+							<label>黃卡</label>
+						</div>
+					</div>
+					<div class="item">
+						<div class="ui child checkbox">
+							<input type="checkbox" name="red">
+							<label>紅卡</label>
+						</div>
+					</div>
+					<div class="item">
+						<div class="ui child checkbox">
+							<input type="checkbox" name="purple">
+							<label>紫卡</label>
+						</div>
+					</div>
+					<div class="item">
+						<div class="ui child checkbox">
+							<input type="checkbox" name="gold">
+							<label>金卡</label>
+						</div>
+					</div>
+					<div class="item">
+						<div class="ui child checkbox">
+							<input type="checkbox" name="black">
+							<label>黑卡</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>		
+	</div>
+	<script type="text/javascript">
+		['black', 'gold', 'purple', 'red', 'yellow', 'blue'].forEach(function(el) {
+			var title;
+			switch (el) {
+				case 'blue':
+					title = '藍卡';
+					break;
+				case 'yellow':
+					title = '黃卡';
+					break;
+				case 'red':
+					title = '紅卡';
+					break;
+				case 'purple':
+					title = '紫卡';
+					break;
+				case 'gold':
+					title = '金卡';
+					break;
+				case 'black':
+					title = '黑卡';
+					break;
+			}
+
+			var table = $('<table class="ui celled table"><thead><tr><th>年</th><th>姓名</th><th>球隊</th><th>卡色</th><th>位置</th><th>打擊方式</th><th>屬性</th><th>升級</th><th>力量</th><th>打擊</th><th>速度</th><th>傳球</th><th>守備</th><th>總合</th></tr></thead><tbody id="' + el + '_batter_table"></tbody></table>');
+			$('#platform').append($('<h2 class="ui header">' + title + '</h2>'));
+			$('#platform').append(table);
+		});
+
+		$.ajax({
+			url: './data/batter.json',
+			async: true,
+			dataType: "json"
+		}).done(function(json) {
+
+			for (var i = 0; i < json.length; i++) {
+				var jn = json[i];
+				var tr = document.createElement('tr');
+
+				["年", "姓名", "球隊", "卡色", "位置", "打擊方式", "屬性", "升級", "力量", "打擊", "速度", "傳球", "守備", "總合"].forEach(function(el) {
+					var td = document.createElement('td');
+					td.textContent = jn[el];
+					tr.appendChild(td);
+				});
+
+				var className;
+				switch (jn.卡色) {
+					case '藍':
+						className = 'blue';
+						break;
+					case '黃':
+						className = 'yellow';
+						break;
+					case '紅':
+						className = 'red';
+						break;
+					case '紫':
+						className = 'purple';
+						break;
+					case '金':
+						className = 'gold';
+						break;
+					case '黑':
+						className = 'black';
+						break;
+				}
+
+				var tbody = document.getElementById(className + '_batter_table');
+				tr.className = className;
+				tbody.appendChild(tr);
+			}
+		});
+
+		$('.list .master.checkbox')
+			.checkbox({
+				// check all children
+				onChecked: function() {
+					var
+						$childCheckbox = $(this).closest('.checkbox').siblings('.list').find('.checkbox');
+					$childCheckbox.checkbox('check');
+				},
+				// uncheck all children
+				onUnchecked: function() {
+					var
+						$childCheckbox = $(this).closest('.checkbox').siblings('.list').find('.checkbox');
+					$childCheckbox.checkbox('uncheck');
+				}
+			});
+
+		$('.list .child.checkbox')
+			.checkbox({
+				// Fire on load to set parent value
+				fireOnInit: true,
+				// Change parent state on each child checkbox change
+				onChange: function() {
+					var
+						$listGroup = $(this).closest('.list'),
+						$parentCheckbox = $listGroup.closest('.item').children('.checkbox'),
+						$checkbox = $listGroup.find('.checkbox'),
+						allChecked = true,
+						allUnchecked = true;
+					// check to see if all other siblings are checked or unchecked
+					$checkbox.each(function() {
+						if ($(this).checkbox('is checked')) {
+							allUnchecked = false;
+							$('#' + $('input', this).attr('name') + '_batter_table').show();
+						} else {
+							allChecked = false;
+							$('#' + $('input', this).attr('name') + '_batter_table').hide();
+						}
+					});
+					// set parent checkbox state, but dont trigger its onChange callback
+					if (allChecked) {
+						$parentCheckbox.checkbox('set checked');
+					} else if (allUnchecked) {
+						$parentCheckbox.checkbox('set unchecked');
+					} else {
+						$parentCheckbox.checkbox('set indeterminate');
+					}
+				}
+			});
+
+		$('.list .master.checkbox').click();
+
+	</script>
+</body>
+
+</html>
